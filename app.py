@@ -89,7 +89,7 @@ class RAGEngine:
         return [r["item"] for r in results[:top_k]]
     
     def _call_llm_api(self, query: str, context: str = "") -> str:
-        """调用大模型API生成回答（支持豆包/硅基流动）"""
+        """调用大模型API生成回答（支持SenseNova/硅基流动）"""
         system_prompt = """你是北京交通大学通信原理实验的智能答疑助手。你的任务是帮助学生解答通信原理实验中的问题。
 
 规则：
@@ -110,13 +110,13 @@ class RAGEngine:
         else:
             user_prompt = f"学生问题：{query}\n\n请回答这个问题。注意：知识库中暂未找到相关内容，以下回答基于通用知识。"
 
-        # 优先尝试DeepSeek API，失败则回退到硅基流动
+        # 优先尝试SenseNova API（商汤，免费额度），失败则回退到硅基流动
         try:
-            response = self._call_deepseek_api(system_prompt, user_prompt)
+            response = self._call_sensenova_api(system_prompt, user_prompt)
             if response:
                 return response
         except Exception as e:
-            print(f"DeepSeek API调用失败: {e}，尝试备用API...")
+            print(f"SenseNova API调用失败: {e}，尝试备用API...")
         
         try:
             response = self._call_siliconflow_api(system_prompt, user_prompt)
@@ -127,23 +127,23 @@ class RAGEngine:
         
         return "[系统提示] 大模型服务暂时不可用，请稍后重试或联系管理员检查API配置。"
     
-    def _call_deepseek_api(self, system_prompt: str, user_prompt: str) -> str:
+    def _call_sensenova_api(self, system_prompt: str, user_prompt: str) -> str:
         """
-        调用DeepSeek大模型API（官方，兼容OpenAI格式）
-        免费额度：每月100万token，实名认证后更多
+        调用SenseNova大模型API（商汤，兼容OpenAI格式）
+        免费额度：DeepSeek V4 Flash 每5小时500次调用（公测期间）
         使用说明：
-        1. 前往 https://platform.deepseek.com 注册账号
-        2. 进入API Keys页面创建API Key
-        3. 在Streamlit Cloud的Secrets中设置 DEEPSEEK_API_KEY
+        1. 前往 https://platform.sensenova.cn 注册账号
+        2. 在控制台 → API Keys 创建密钥
+        3. 在Streamlit Cloud的Secrets中设置 SENSENOVA_API_KEY
         """
         import os
         
-        api_key = os.environ.get("DEEPSEEK_API_KEY", "")
+        api_key = os.environ.get("SENSENOVA_API_KEY", "")
         
         if not api_key:
-            raise Exception("DeepSeek API未配置，请在Streamlit Secrets中设置 DEEPSEEK_API_KEY")
+            raise Exception("SenseNova API未配置，请在Streamlit Secrets中设置 SENSENOVA_API_KEY")
         
-        url = "https://api.deepseek.com/chat/completions"
+        url = "https://token.sensenova.cn/v1/chat/completions"
         
         headers = {
             "Content-Type": "application/json",
@@ -151,7 +151,7 @@ class RAGEngine:
         }
         
         payload = {
-            "model": "deepseek-chat",
+            "model": "deepseek-v4-flash",
             "messages": [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
@@ -167,7 +167,7 @@ class RAGEngine:
             result = response.json()
             return result["choices"][0]["message"]["content"]
         else:
-            raise Exception(f"DeepSeek API返回错误: {response.status_code} - {response.text}")
+            raise Exception(f"SenseNova API返回错误: {response.status_code} - {response.text}")
     
     def _call_siliconflow_api(self, system_prompt: str, user_prompt: str) -> str:
         """调用硅基流动API（备用）"""
