@@ -110,13 +110,13 @@ class RAGEngine:
         else:
             user_prompt = f"学生问题：{query}\n\n请回答这个问题。注意：知识库中暂未找到相关内容，以下回答基于通用知识。"
 
-        # 优先尝试豆包API，失败则回退到硅基流动
+        # 优先尝试DeepSeek API，失败则回退到硅基流动
         try:
-            response = self._call_doubao_api(system_prompt, user_prompt)
+            response = self._call_deepseek_api(system_prompt, user_prompt)
             if response:
                 return response
         except Exception as e:
-            print(f"豆包API调用失败: {e}，尝试备用API...")
+            print(f"DeepSeek API调用失败: {e}，尝试备用API...")
         
         try:
             response = self._call_siliconflow_api(system_prompt, user_prompt)
@@ -127,26 +127,23 @@ class RAGEngine:
         
         return "[系统提示] 大模型服务暂时不可用，请稍后重试或联系管理员检查API配置。"
     
-    def _call_doubao_api(self, system_prompt: str, user_prompt: str) -> str:
+    def _call_deepseek_api(self, system_prompt: str, user_prompt: str) -> str:
         """
-        调用豆包大模型API（火山方舟）
+        调用DeepSeek大模型API（官方，兼容OpenAI格式）
+        免费额度：每月100万token，实名认证后更多
         使用说明：
-        1. 前往 https://console.volcengine.com/ark 注册火山引擎账号
-        2. 创建API Key（形如：bf8c0...）
-        3. 获取Endpoint ID（形如：ep-2025...）
-        4. 在Streamlit Cloud的Secrets中设置 DOUBAO_API_KEY 和 DOUBAO_ENDPOINT_ID
+        1. 前往 https://platform.deepseek.com 注册账号
+        2. 进入API Keys页面创建API Key
+        3. 在Streamlit Cloud的Secrets中设置 DEEPSEEK_API_KEY
         """
         import os
         
-        # 从环境变量或Streamlit Secrets读取配置
-        api_key = os.environ.get("DOUBAO_API_KEY", "")
-        endpoint_id = os.environ.get("DOUBAO_ENDPOINT_ID", "")
+        api_key = os.environ.get("DEEPSEEK_API_KEY", "")
         
-        # 如果没有配置豆包API，直接抛出异常让系统回退到备用API
-        if not api_key or not endpoint_id:
-            raise Exception("豆包API未配置，请在Streamlit Secrets中设置 DOUBAO_API_KEY 和 DOUBAO_ENDPOINT_ID")
+        if not api_key:
+            raise Exception("DeepSeek API未配置，请在Streamlit Secrets中设置 DEEPSEEK_API_KEY")
         
-        url = f"https://ark.cn-beijing.volces.com/api/v3/chat/completions"
+        url = "https://api.deepseek.com/chat/completions"
         
         headers = {
             "Content-Type": "application/json",
@@ -154,7 +151,7 @@ class RAGEngine:
         }
         
         payload = {
-            "model": endpoint_id,  # 使用Endpoint ID作为模型标识
+            "model": "deepseek-chat",
             "messages": [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
@@ -170,7 +167,7 @@ class RAGEngine:
             result = response.json()
             return result["choices"][0]["message"]["content"]
         else:
-            raise Exception(f"豆包API返回错误: {response.status_code} - {response.text}")
+            raise Exception(f"DeepSeek API返回错误: {response.status_code} - {response.text}")
     
     def _call_siliconflow_api(self, system_prompt: str, user_prompt: str) -> str:
         """调用硅基流动API（备用）"""
