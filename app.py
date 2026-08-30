@@ -387,8 +387,12 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ============ 初始化RAG引擎 ============
+# 清除旧缓存，确保使用新版RAGEngine（多模态版）
+if hasattr(st, 'cache_resource'):
+    st.cache_resource.clear()
+
 @st.cache_resource
-def init_engine():
+def init_engine_v2():
     return RAGEngine()
 
 # ============ 侧边栏 ============
@@ -469,7 +473,7 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 if "rag_engine" not in st.session_state:
-    st.session_state.rag_engine = init_engine()
+    st.session_state.rag_engine = init_engine_v2()
 
 # 欢迎消息
 if len(st.session_state.messages) == 0:
