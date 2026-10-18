@@ -190,7 +190,7 @@ class RAGEngine:
     def _call_sensenova_api(self, system_prompt: str, user_prompt: str, image_data: str = None) -> str:
         """
         调用SenseNova大模型API（商汤，兼容OpenAI格式）
-        模型：sensenova-6.7-flash-lite（支持文字+图片多模态）
+        模型：sensenova-6.8-flash-lite（支持文字+图片多模态）
         免费额度：公测期间每5小时1500次调用
         """
         api_key = os.environ.get("SENSENOVA_API_KEY", "")
@@ -214,7 +214,7 @@ class RAGEngine:
             user_content = user_prompt
 
         payload = {
-            "model": "sensenova-6.7-flash-lite",
+            "model": "sensenova-6.8-flash-lite",
             "messages": [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_content}
@@ -669,7 +669,7 @@ with col3:
         **核心能力：**
         - 📚 专属知识库（12条通信原理实验条目）
         - 📷 图片识别（示波器波形、仪器面板等）
-        - 🧠 多模态大模型（SenseNova 6.7 Flash-Lite）
+        - 🧠 多模态大模型（SenseNova 6.8 Flash-Lite）
         - 🔍 智能检索 + 知识增强生成
 
         技术栈：Python + Streamlit + RAG + SenseNova多模态大模型API
