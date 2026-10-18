@@ -342,7 +342,27 @@ st.markdown("""
         border-radius: 15px;
         margin: 10px 0;
         box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        font-size: 0.95rem;
+        line-height: 1.65;
     }
+    /* 限制AI回答中markdown元素的字号 */
+    .assistant-message h1, .assistant-message h2, .assistant-message h3,
+    .assistant-message h4, .assistant-message h5, .assistant-message h6 {
+        font-size: 1.05rem !important;
+        font-weight: 600;
+        color: #1e3a8a;
+        margin: 8px 0 4px 0;
+        padding: 0;
+        border: none;
+    }
+    .assistant-message p, .assistant-message li,
+    .assistant-message ol, .assistant-message ul {
+        font-size: 0.95rem !important;
+        line-height: 1.65;
+        margin: 4px 0;
+    }
+    .assistant-message strong { color: #1e3a8a; }
+    .assistant-message code { font-size: 0.85rem; }
     .user-message {
         background: linear-gradient(135deg, #667eea, #764ba2);
         color: white;
@@ -514,7 +534,7 @@ cols = st.columns(len(quick_questions))
 for i, question in enumerate(quick_questions):
     with cols[i]:
         if st.button(question, key=f"quick_{i}", use_container_width=True):
-            st.session_state.current_question = question
+            st.session_state.pending_question = question
 
 st.markdown("---")
 
@@ -561,12 +581,6 @@ for message in st.session_state.messages:
 # 输入区域
 st.markdown("---")
 
-if "current_question" in st.session_state:
-    default_value = st.session_state.current_question
-    del st.session_state.current_question
-else:
-    default_value = ""
-
 # 图片上传区域
 st.markdown("##### 📷 上传实验图片（可选）")
 uploaded_image = st.file_uploader(
@@ -591,7 +605,6 @@ with st.form(key="question_form", clear_on_submit=True):
     with col1:
         user_input = st.text_input(
             "输入你的实验问题：",
-            value=default_value,
             placeholder="例如：示波器波形不稳定怎么办？（也可上传图片后提问）",
             key="user_question",
             label_visibility="collapsed"
@@ -599,8 +612,14 @@ with st.form(key="question_form", clear_on_submit=True):
     with col2:
         submit_button = st.form_submit_button("🚀 提问", use_container_width=True)
 
-if submit_button and (user_input.strip() or image_data_url):
-    question_text = user_input.strip() if user_input.strip() else "请分析这张实验图片"
+# 快速提问点击后存入 pending_question，这里取出并直接提交
+pending_question = st.session_state.pop("pending_question", None)
+
+if pending_question or (submit_button and (user_input.strip() or image_data_url)):
+    if pending_question:
+        question_text = pending_question
+    else:
+        question_text = user_input.strip() if user_input.strip() else "请分析这张实验图片"
 
     st.session_state.messages.append({
         "role": "user",
