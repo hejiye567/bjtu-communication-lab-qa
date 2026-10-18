@@ -314,17 +314,19 @@ st.markdown("""
     }
     .main-title {
         text-align: center;
-        color: #1e3a8a;
+        color: #ffffff;
         font-size: 2.2em;
         font-weight: bold;
         margin-bottom: 5px;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        text-shadow: 2px 2px 6px rgba(0,0,0,0.35);
     }
     .sub-title {
         text-align: center;
-        color: #64748b;
-        font-size: 1.1em;
+        color: #ffffff;
+        font-size: 1.05em;
+        font-weight: 500;
         margin-bottom: 20px;
+        text-shadow: 1px 1px 4px rgba(0,0,0,0.35);
     }
     .school-badge {
         text-align: center;
@@ -399,8 +401,8 @@ def init_engine_v2():
 with st.sidebar:
     st.markdown("""
     <div style="text-align: center; padding: 20px 0;">
-        <h2 style="color: white;">🎓 实验智答</h2>
-        <p style="color: rgba(255,255,255,0.8);">AI辅助答疑系统</p>
+        <h2 style="color: #1e3a8a;">🎓 实验智答</h2>
+        <p style="color: #475569;">AI辅助答疑系统</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -408,7 +410,7 @@ with st.sidebar:
 
     st.markdown("### 📊 系统状态")
     st.markdown("""
-    <div style="color: white;">
+    <div style="color: #334155;">
         🟢 大模型服务：在线<br>
         🟢 多模态识别：已启用<br>
         🟢 知识库：已加载<br>
@@ -420,12 +422,12 @@ with st.sidebar:
 
     st.markdown("### 📚 知识库")
     st.markdown("""
-    <div style="color: white;">
+    <div style="color: #334155;">
         • 仪器操作：3条<br>
         • 故障排查：3条<br>
         • 实验内容：6条<br>
         <br>
-        <small>知识库持续扩充中...</small>
+        <small style="color: #64748b;">知识库持续扩充中...</small>
     </div>
     """, unsafe_allow_html=True)
 
@@ -433,7 +435,7 @@ with st.sidebar:
 
     st.markdown("### ❓ 使用说明")
     st.markdown("""
-    <div style="color: rgba(255,255,255,0.9); font-size: 0.9em;">
+    <div style="color: #334155; font-size: 0.9em;">
         <b>📝 文字提问：</b><br>
         在输入框输入实验相关问题<br><br>
         <b>📷 图片提问：</b><br>
@@ -448,7 +450,7 @@ with st.sidebar:
     st.markdown("---")
 
     st.markdown("""
-    <div style="color: rgba(255,255,255,0.7); font-size: 0.8em; text-align: center;">
+    <div style="color: #64748b; font-size: 0.8em; text-align: center;">
         北京交通大学<br>
         电子信息工程学院<br>
         通信工程专业实验室<br><br>
