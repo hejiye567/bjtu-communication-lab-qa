@@ -384,7 +384,14 @@ st.markdown("""
     }
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
-    header {visibility: hidden;}
+    /* 顶栏透明但保留侧边栏展开按钮 */
+    header {
+        background: transparent !important;
+    }
+    /* 只隐藏顶栏右侧的工具按钮（Deploy等），保留左侧侧边栏开关 */
+    [data-testid="stHeaderActionElements"] {
+        display: none !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
